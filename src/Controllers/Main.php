@@ -19,10 +19,10 @@
 
 				Database::connect();
 
-				$post = new Post( Carbon::now(), "Wassup bruh, dis is the contnt", "Taitol", "wassup-bruh2", "Categoria Nuova" );
-				$post = new Post( Carbon::now(), "Wassup bruh, dis is the contnt", "Taitol", "wassup-bruh2", "New Cat" );
+				$post = new Post( Carbon::now(), "Wassup bruh, dis is the contnt", "Taitol", "wassup-bruh1", [ "New Cat 1", "New Cat 2" ] );
 				$post->save();
-				//Log::log( "<blue>".$post->get_query() );
+				$post = new Post( Carbon::now(), "Wassup bruh, dis is the contnt", "Taitol", "wassup-bruh2", [ "New Cat 2", "New Cat 3" ] );
+				$post->save();
 
 				
 

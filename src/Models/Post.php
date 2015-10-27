@@ -34,7 +34,7 @@
 
 		private $post_id 		= null;
 
-		private $category 		= null;
+		private $category 		= [];
 
 		public function __construct( $date, $content, $title, $name, $category = false ){
 			$this->post_date = $date;
@@ -45,18 +45,27 @@
 			$this->post_title = $title;
 			$this->post_name = $name;
 			$this->set_default();
-			if( $category !== false )
+			if( $category !== false ){
 				$this->category( $category );
+			}
 		}
 
 		public function category( $cat = false ){
 			if( $cat === false ){
-				return $this->category;
+				return $cat;
 			}else if( is_object( $cat ) ){
-				$this->category = $cat;
+				$cat[] = $cat;
 			}else if( is_string( $cat ) ){
-				$this->category = new Category( $cat );
-				return $this->category;
+				$cat[] = new Category( $cat );
+				return $cat;
+			}else if( is_array( $cat ) ){
+				foreach( $cat as $val ){
+					if( is_string( $val ) ){
+						$this->category[] = new Category( $val );
+					}else{
+						$this->category[] = $val;
+					}
+				}
 			}
 		}
 
@@ -90,7 +99,6 @@
 
 		public function save(){
 			$verbose = Config::$env == "dev" ? true : false;
-			$this->category->check_exists();
 			$post_save_query = $this->get_query();
 			$post_saved = Database::exec( $post_save_query );
 			if( $post_saved === false ){
@@ -102,21 +110,24 @@
 			$this->post_id = Database::$conn->insert_id;
 			if( $verbose )
 				Log::log( "<green>Article with ID [".$this->post_id."] saved." );
-			$relation_query = "INSERT INTO `".Config::$db_name."`.`".Config::$wp_prefix."term_relationships` ( `object_id`, `term_taxonomy_id`, `term_order` ) VALUE ( ".$this->post_id.", ".$this->category->tax_id.", 0 )";
-			$relation_exec = Database::exec( $relation_query );
-			if( $relation_exec === false ){
-				Log::log( "<red>Cannot save the link between the article and the taxonomy:" );
-				Log::log( "[".Database::$conn->errno()."] ".Database::$conn->error );
-				Log::log( "<red>".$relation_query );
-				exit();
-			}
-			$count_query = "UPDATE `".Config::$db_name."`.`".Config::$wp_prefix."term_taxonomy` SET count = count +1 WHERE `term_taxonomy_id` = ".$this->category->tax_id.";";
-			$count_exec = Database::exec( $count_query );
-			if( $count_exec === false ){
-				Log::log( "<red>Cannot add the article to the counter:" );
-				Log::log( "[".Database::$conn->errno()."] ".Database::$conn->error );
-				Log::log( "<red>".$count_query );
-				exit();
+			foreach( $this->category as $cat_key => $cat ){
+				$cat->check_exists();
+				$relation_query = "INSERT INTO `".Config::$db_name."`.`".Config::$wp_prefix."term_relationships` ( `object_id`, `term_taxonomy_id`, `term_order` ) VALUE ( ".$this->post_id.", ".$cat->tax_id.", 0 )";
+				$relation_exec = Database::exec( $relation_query );
+				if( $relation_exec === false ){
+					Log::log( "<red>\t\tCannot save the link between the article and the taxonomy:" );
+					Log::log( "<red>\t\t[".Database::$conn->errno()."] ".Database::$conn->error );
+					Log::log( "<red>\t\t".$relation_query );
+					exit();
+				}
+				$count_query = "UPDATE `".Config::$db_name."`.`".Config::$wp_prefix."term_taxonomy` SET count = count +1 WHERE `term_taxonomy_id` = ".$cat->tax_id.";";
+				$count_exec = Database::exec( $count_query );
+				if( $count_exec === false ){
+					Log::log( "<red>\t\tCannot add the article to the counter:" );
+					Log::log( "<red>\t\t[".Database::$conn->errno()."] ".Database::$conn->error );
+					Log::log( "<red>\t\t".$count_query );
+					exit();
+				}
 			}
 			Log::log( "<green>Article #".$this->post_id." saved with its category." );
 		}
