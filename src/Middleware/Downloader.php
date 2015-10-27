@@ -5,6 +5,8 @@
 	use \Scraper\Middleware\Log;
 
 	class Downloader{
+
+		public static $tries = 10;
 		
 		public static function get( $url ){
 			$client = new Guzzle();
@@ -21,7 +23,7 @@
 				}
 				
 				$tries++;
-			}while( ( !$res || $res->getStatusCode() == 200 ) && $tries < 10 );
+			}while( ( !$res || $res->getStatusCode() == 200 ) && $tries < self::$tries );
 			if( $res == null ){
 				Log::log( $error );
 			}
