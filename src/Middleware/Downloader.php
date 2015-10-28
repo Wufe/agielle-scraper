@@ -1,25 +1,28 @@
 <?php
 
 	namespace Scraper\Middleware;
-	use \GuzzleHttp\Client  as Guzzle;
-	use \Scraper\Middleware\Log;
+	use GuzzleHttp\Client  as Guzzle;
+	use Scraper\Middleware\Log;
+	use Scraper\Configuration\Config;
 
 	class Downloader{
 
 		public static $tries = 10;
 		
 		public static function get( $url ){
-			$client = new Guzzle();
+			$client = new Guzzle( [ 'base_uri' => Config::$base_uri ]);
 			$res = null;
 			$tries = 0;
 			$error = null;
 			do{
 				try{
-					$res = $client->request( 'GET', $url, [ 'timeout' => 10, 'http_errors' => false ]);	
+					$res = $client->request( 'GET', $url, [ 'timeout' => 600, 'http_errors' => false ]);	
 				}catch( \GuzzleHttp\Exception\ConnectException $e ){
-					$error = "ConnectException: ".$e->getMessage();
+					$error = "<red>ConnectException: ".$e->getMessage();
+					Log::log( "<red>Retrying" );
 				}catch( \GuzzleHttp\Exception\RequestException $e ){
-					$error = "RequestException: ".$e->getMessage();
+					$error = "<red>RequestException: ".$e->getMessage();
+					Log::log( "<red>Retrying" );
 				}
 				
 				$tries++;

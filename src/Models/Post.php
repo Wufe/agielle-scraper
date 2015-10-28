@@ -115,17 +115,17 @@
 				$relation_query = "INSERT INTO `".Config::$db_name."`.`".Config::$wp_prefix."term_relationships` ( `object_id`, `term_taxonomy_id`, `term_order` ) VALUE ( ".$this->post_id.", ".$cat->tax_id.", 0 )";
 				$relation_exec = Database::exec( $relation_query );
 				if( $relation_exec === false ){
-					Log::log( "<red>\t\tCannot save the link between the article and the taxonomy:" );
-					Log::log( "<red>\t\t[".Database::$conn->errno()."] ".Database::$conn->error );
-					Log::log( "<red>\t\t".$relation_query );
+					Log::log( "<red>Cannot save the link between the article and the taxonomy:" );
+					Log::log( "<red>[".Database::$conn->errno."] ".Database::$conn->error );
+					Log::log( "<red>".$relation_query );
 					exit();
 				}
 				$count_query = "UPDATE `".Config::$db_name."`.`".Config::$wp_prefix."term_taxonomy` SET count = count +1 WHERE `term_taxonomy_id` = ".$cat->tax_id.";";
 				$count_exec = Database::exec( $count_query );
 				if( $count_exec === false ){
-					Log::log( "<red>\t\tCannot add the article to the counter:" );
-					Log::log( "<red>\t\t[".Database::$conn->errno()."] ".Database::$conn->error );
-					Log::log( "<red>\t\t".$count_query );
+					Log::log( "<red>Cannot add the article to the counter:" );
+					Log::log( "<red>[".Database::$conn->errno()."] ".Database::$conn->error );
+					Log::log( "<red>".$count_query );
 					exit();
 				}
 			}

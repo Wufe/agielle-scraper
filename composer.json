@@ -11,7 +11,8 @@
         "guzzle/guzzle": "^3.9",
         "nesbot/carbon": "^1.20",
         "guzzlehttp/guzzle": "^6.1",
-        "symfony/dom-crawler": "^2.7"
+        "symfony/dom-crawler": "^2.7",
+        "symfony/css-selector": "^2.7"
     },
     "autoload": {
         "psr-4": {
