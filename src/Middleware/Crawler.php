@@ -18,6 +18,7 @@
 		public static $count 	= 0;
 
 		public static function crawl(){
+			self::$count = Config::$post_count;
 			self::get_archives();
 			self::parse_archives();
 		}
@@ -86,12 +87,13 @@
 						$categories = [];
 						foreach( $cats as $cat ){
 							$cat = $cat->nodeValue;
-							$categories[] = $cat;
+							if( @!!trim( $cat ) )
+								$categories[] = $cat;
 						}
-						Log::log( "<darkGreen>Categories: ".implode( ", ", $categories ) );
+						Log::log( "<darkGreen>Categories: ".( @!!$categories ? "none" : implode( ", ", $categories )  ) );
 						if( @!!$article )$valid = true;
 					}while( !$valid );
-					$post = new Post( $date, $article, $title, $name, $categories );
+					$post = new Post( $date, $article, $title, $name, @!!$categories ? $categories : false );
 					$post->save();
 					self::$count++;
 					if( $verbose )
@@ -124,7 +126,7 @@
 			// We are commenting this lines of code because the website returns 504-gateway timeout.
 			// So I decided to save the index ( the heaviest ) pages into a local webserver, 
 			// to be able to download them faster
-			
+
 			/*$verbose = Config::$env == "dev" ? true : false;
 			Log::log( "Downloading archive.." );
 			$source = Downloader::get( "/archivio/" );

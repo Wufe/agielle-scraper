@@ -56,11 +56,15 @@
 			}else if( is_object( $cat ) ){
 				$cat[] = $cat;
 			}else if( is_string( $cat ) ){
-				$cat[] = new Category( $cat );
-				return $cat;
+				if( @!!trim( $cat ) ){
+					$cat[] = new Category( $cat );
+					return $cat;	
+				}else{
+					return false;
+				}
 			}else if( is_array( $cat ) ){
 				foreach( $cat as $val ){
-					if( is_string( $val ) ){
+					if( is_string( $val ) && @!!trim( $val ) ){
 						$this->category[] = new Category( $val );
 					}else{
 						$this->category[] = $val;
