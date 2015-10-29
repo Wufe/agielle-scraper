@@ -16,8 +16,9 @@
 		public static $env 	     = "dev"; // dev or prod
 
 		public static $status_archive = 7;
-		public static $status_post 	  = 104;
+		public static $status_post 	  = 105;
 		public static $post_count	  = 15001;
+		public static $post_end 	  = false;
 
 	}
 

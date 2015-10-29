@@ -55,7 +55,7 @@
 					$href = $domElement->getAttribute( 'href' );
 					$text = trim( $domElement->nodeValue );
 					$text = explode( "\n", $text );
-					$title = trim( $text[ 0 ] );
+					$title = \utf8_decode( htmlentities( trim( $text[ 0 ] ) ) );
 					$date = [ 0, 0, 0, 0, 0, 0 ];
 					preg_match( "#(\d+)\/(\d+)\/(\d+)\s\-\s(\d+):(\d+)#is", $text[ 1 ], $date );
 					$date = Carbon::create( $date[ 3 ], $date[ 2 ], $date[ 1 ], $date[ 4 ], $date[ 5 ] );
@@ -98,7 +98,7 @@
 					self::$count++;
 					if( $verbose )
 						Log::log( "<red>Count: ".self::$count );
-					if( self::$count >= 15000 ){
+					if( Config::$post_end !== false && self::$count >= Config::$post_end ){
 						Log::log( "<red>Ended." );
 						exit();
 					}

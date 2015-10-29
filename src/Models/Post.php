@@ -133,7 +133,7 @@
 					exit();
 				}
 			}
-			Log::log( "<green>Article #".$this->post_id." saved with its category." );
+			Log::log( "<green>Article #".$this->post_id." saved with its categories." );
 		}
 	}
 
